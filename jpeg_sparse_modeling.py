@@ -270,7 +270,7 @@ class JPEG_sparse:
             else:
                 DCT_img = np.concatenate([DCT_img,  pre_coef])
             
-            print("\r","calclateing(incredible inefficient progress), ( 1 ~",y//8,")",i+1,end='')
+            print("\r","calculateing(incredible inefficient progress), ( 1 ~",y//8,")",i+1,end='')
 
         print("")   
         DCT_img = DCT_img.astype(dtype=int)
@@ -394,6 +394,8 @@ def original_jpeg_convert():
     print("\t\tPSNR :",psnr(img,converted_img,data_range=255))
     print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
 
+    cv2.imwrite('./jpeg_converted.png', converted_img)
+
 def new_jpeg_convert():
     img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
     img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
@@ -421,6 +423,8 @@ def new_jpeg_convert():
     print("\t\tPSNR :",psnr(img,converted_img,data_range=255))
     print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
 
+    cv2.imwrite('./new_jpeg__no__quantize.png', converted_img)
+
     #----------------------
     img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
     img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
@@ -442,6 +446,8 @@ def new_jpeg_convert():
 
     print("\t\tPSNR :",psnr(img,converted_img,data_range=255))
     print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
+
+    cv2.imwrite('./new_jpeg.png', converted_img)
 
     plt.subplot(1,2,2)
     plt.imshow(converted_img,vmin=0,vmax=255)
