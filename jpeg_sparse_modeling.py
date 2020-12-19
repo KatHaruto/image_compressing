@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 from pprint import pprint
 from cvxpy import *
 import time
-
+from skimage.metrics import peak_signal_noise_ratio as psnr
+from skimage.metrics import structural_similarity as ssim
 
 N = 8
 
@@ -312,7 +313,6 @@ def correct_abnormal_value(img):
             if img[i,j] > 255:
                 img[i,j] = 255
 
-
 def jpeg_img_test():
     
     img_test = np.array([
@@ -340,9 +340,12 @@ def jpeg_img_test():
     plt.imshow(converted_img,vmin=0,vmax=255)
     plt.title("jpeg converted")
 
+    print("\t\tPSNR :",psnr(img_test,converted_img,data_range=255))
+    print("\t\tSSIM :",ssim(img_test,converted_img,data_range=255))
+
 def original_jpeg_convert():
     img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
-    ent = calc_entropy(img)
+    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
     #----------------------
     jpeg_no_quantize = JPEG(N)
 
@@ -350,9 +353,9 @@ def original_jpeg_convert():
     plt.subplot(1,2,1)
     plt.imshow(img,vmin=0, vmax=255)
     plt.title("original")
+    converted_img = jpeg_no_quantize.convertToJPEG(img_,is_quantize=False)
 
-    converted_img = jpeg_no_quantize.convertToJPEG(img,is_quantize=False)
-    compressed = jpeg_no_quantize.compressed_img(img,is_quantize=False)
+    compressed = jpeg_no_quantize.compressed_img(img_,is_quantize=False)
     print("original jpeg convert ")
     print("\tno quantize")
     print("\tnumber of dct with zero as its coefficient",jpeg_no_quantize.sparse_num)
@@ -361,12 +364,15 @@ def original_jpeg_convert():
     plt.imshow(converted_img,vmin=0,vmax=255)
     plt.title("jpeg converted")
 
-    print("\t\tentropy")
-    print("\t\toriginal :",ent)
-    print("\t\tconverted :",calc_entropy(compressed,is_compressed=True))
+    print("\t\tentropy :",calc_entropy(compressed,is_compressed=True))
 
+    with np.errstate(divide='ignore'): 
+        divide = psnr(img,converted_img,data_range=255)
+    print("\t\tPSNR :",divide)
+    print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
 
     img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
     jpeg = JPEG(N)
 
     plt.figure(figsize=(6, 4))
@@ -375,22 +381,24 @@ def original_jpeg_convert():
     plt.title("original")
 
 
-    converted_img = jpeg.convertToJPEG(img)
-    compressed = jpeg.compressed_img(img)
+    converted_img = jpeg.convertToJPEG(img_)
+    compressed = jpeg.compressed_img(img_)
     print("\tquantize")
     print("\tnumber of dct with zero as its coefficient",jpeg.sparse_num)
     plt.subplot(1,2,2)
     plt.imshow(converted_img,vmin=0,vmax=255)
     plt.title("jpeg converted")
 
-    print("\t\tentropy")
-    print("\t\toriginal :",ent)
-    print("\t\tconverted :",calc_entropy(compressed,is_compressed=True))
+    print("\t\tentropy :",calc_entropy(compressed,is_compressed=True))
+
+    print("\t\tPSNR :",psnr(img,converted_img,data_range=255))
+    print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
 
 def new_jpeg_convert():
     img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    #----------------------
     sparse_no_qunatize = JPEG_sparse(N)
-    ent = calc_entropy(img)
 
     print("new jpeg convert using L1 norm")
 
@@ -399,8 +407,8 @@ def new_jpeg_convert():
     plt.imshow(img,vmin=0, vmax=255)
     plt.title("original")
 
-    converted_img = sparse_no_qunatize.convertToJPEG(img,is_quantize=False)
-    compressed = sparse_no_qunatize.compressed_img(img,is_quantize=False)
+    converted_img = sparse_no_qunatize.convertToJPEG(img_,is_quantize=False)
+    compressed = sparse_no_qunatize.compressed_img(img_,is_quantize=False)
     print("\tno quantize")
     print("\tnumber of L1 with zero as its coefficient",sparse_no_qunatize.sparse_num)
 
@@ -408,12 +416,15 @@ def new_jpeg_convert():
     plt.imshow(converted_img,vmin=0,vmax=255)
     plt.title("jpeg converted")
 
-    print("\t\tentropy")
-    print("\t\toriginal :",ent)
-    print("\t\tconverted :",calc_entropy(compressed,is_compressed=True))
+    print("\t\tentropy :",calc_entropy(compressed,is_compressed=True))
+
+    print("\t\tPSNR :",psnr(img,converted_img,data_range=255))
+    print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
 
     #----------------------
     img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    #----------------------
     sparse = JPEG_sparse(N)
 
     plt.figure(figsize=(6, 4))
@@ -421,25 +432,27 @@ def new_jpeg_convert():
     plt.imshow(img,vmin=0, vmax=255)
     plt.title("original")
 
-    converted_img = sparse.convertToJPEG(img)
-    compressed = sparse.compressed_img(img)
+    converted_img = sparse.convertToJPEG(img_)
+    compressed = sparse.compressed_img(img_)
 
     print("\tquantize")
     print("\tnumber of L1 with zero as its coefficient",sparse.sparse_num)
 
-    print("\t\tentropy")
-    print("\t\toriginal :",ent)
-    print("\t\tconverted :",calc_entropy(compressed))
+    print("\t\tentropy :",calc_entropy(compressed))
+
+    print("\t\tPSNR :",psnr(img,converted_img,data_range=255))
+    print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
 
     plt.subplot(1,2,2)
     plt.imshow(converted_img,vmin=0,vmax=255)
     plt.title("jpeg converted")
-    plt.show()
 
 if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     jpeg_img_test()
+    plt.show()
     original_jpeg_convert()
     print("-----------------------------------------------------")
     new_jpeg_convert()
+    plt.show()
