@@ -53,9 +53,9 @@ class JPEG:
         for i in range(y//8):
             for j in range(x//8):
                 if is_quantize == True:
-                    converted_img = self.convert(image_list[i*80+j])
+                    converted_img = self.convert(image_list[i*(y//N)+j])
                 else:
-                    converted_img = self.convert_no_quantize(image_list[i*80+j])
+                    converted_img = self.convert_no_quantize(image_list[i*(y//N)+j])
                 if j == 0:
                     pre_coef = converted_img
                 else:
@@ -112,9 +112,9 @@ class JPEG:
         for i in range(y//8):
             for j in range(x//8):
                 if is_quantize==True:
-                    dct_img = np.array(np.split(self.quantize(np.array(np.split(self.dct(image_list[i*80+j]),8))),8))
+                    dct_img = np.array(np.split(self.quantize(np.array(np.split(self.dct(image_list[i*(y//N)+j]),8))),8))
                 else:
-                    dct_img = self.dct(image_list[i*80+j])
+                    dct_img = self.dct(image_list[i*(y//N)+j])
                 
                 if j == 0:
                     pre_coef = dct_img
@@ -170,9 +170,9 @@ class JPEG_sparse:
         for i in range(y//8):
             for j in range(x//8):
                 if is_quantize==True:
-                    converted_img = self.convert(image_list[i*80+j])
+                    converted_img = self.convert(image_list[i*(y//N)+j])
                 else:
-                    converted_img = self.convert_no_qunatize(image_list[i*80+j])
+                    converted_img = self.convert_no_qunatize(image_list[i*(y//N)+j])
                 
                 if j == 0:
                     pre_coef = converted_img
@@ -256,9 +256,9 @@ class JPEG_sparse:
         for i in range(y//8):
             for j in range(x//8):
                 if is_quantize==True:
-                    dct_img = np.array(np.split(self.quantize(np.array(np.split(self.dct(image_list[i*80+j]),8))),8))
+                    dct_img = np.array(np.split(self.quantize(np.array(np.split(self.dct(image_list[i*(y//N)+j]),8))),8))
                 else:
-                    dct_img = np.array(np.split(self.dct(image_list[i*80+j]),8))
+                    dct_img = np.array(np.split(self.dct(image_list[i*(y//N)+j]),8))
                 
                 if j == 0:
                     pre_coef = dct_img
@@ -339,13 +339,15 @@ def jpeg_img_test():
     plt.subplot(1,2,2)
     plt.imshow(converted_img,vmin=0,vmax=255)
     plt.title("jpeg converted")
+    plt.gray()
+
 
     print("\t\tPSNR :",psnr(img_test,converted_img,data_range=255))
     print("\t\tSSIM :",ssim(img_test,converted_img,data_range=255))
 
 def original_jpeg_convert():
-    img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
-    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    img = cv2.imread('girl.bmp', 0).astype(dtype=int)
+    img_= cv2.imread('girl.bmp', 0).astype(dtype=int)
     #----------------------
     jpeg_no_quantize = JPEG(N)
 
@@ -353,6 +355,7 @@ def original_jpeg_convert():
     plt.subplot(1,2,1)
     plt.imshow(img,vmin=0, vmax=255)
     plt.title("original")
+    plt.gray()
     converted_img = jpeg_no_quantize.convertToJPEG(img_,is_quantize=False)
 
     compressed = jpeg_no_quantize.compressed_img(img_,is_quantize=False)
@@ -371,15 +374,15 @@ def original_jpeg_convert():
     print("\t\tPSNR :",divide)
     print("\t\tSSIM :",ssim(img,converted_img,data_range=255))
 
-    img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
-    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    img = cv2.imread('girl.bmp', 0).astype(dtype=int)
+    img_= cv2.imread('girl.bmp', 0).astype(dtype=int)
     jpeg = JPEG(N)
 
     plt.figure(figsize=(6, 4))
     plt.subplot(1,2,1)
     plt.imshow(img,vmin=0, vmax=255)
     plt.title("original")
-
+    plt.gray()
 
     converted_img = jpeg.convertToJPEG(img_)
     compressed = jpeg.compressed_img(img_)
@@ -397,8 +400,8 @@ def original_jpeg_convert():
     cv2.imwrite('./jpeg_converted.png', converted_img)
 
 def new_jpeg_convert():
-    img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
-    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    img = cv2.imread('girl.bmp', 0).astype(dtype=int)
+    img_= cv2.imread('girl.bmp', 0).astype(dtype=int)
     #----------------------
     sparse_no_qunatize = JPEG_sparse(N)
 
@@ -408,6 +411,8 @@ def new_jpeg_convert():
     plt.subplot(1,2,1)
     plt.imshow(img,vmin=0, vmax=255)
     plt.title("original")
+    plt.gray()
+
 
     converted_img = sparse_no_qunatize.convertToJPEG(img_,is_quantize=False)
     compressed = sparse_no_qunatize.compressed_img(img_,is_quantize=False)
@@ -426,8 +431,8 @@ def new_jpeg_convert():
     cv2.imwrite('./new_jpeg__no__quantize.png', converted_img)
 
     #----------------------
-    img = cv2.imread('my_picture.bmp', 0).astype(dtype=int)
-    img_= cv2.imread('my_picture.bmp', 0).astype(dtype=int)
+    img = cv2.imread('girl.bmp', 0).astype(dtype=int)
+    img_= cv2.imread('girl.bmp', 0).astype(dtype=int)
     #----------------------
     sparse = JPEG_sparse(N)
 
@@ -435,6 +440,8 @@ def new_jpeg_convert():
     plt.subplot(1,2,1)
     plt.imshow(img,vmin=0, vmax=255)
     plt.title("original")
+    plt.gray()
+
 
     converted_img = sparse.convertToJPEG(img_)
     compressed = sparse.compressed_img(img_)
@@ -452,12 +459,14 @@ def new_jpeg_convert():
     plt.subplot(1,2,2)
     plt.imshow(converted_img,vmin=0,vmax=255)
     plt.title("jpeg converted")
+    plt.gray()
+
 
 if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    jpeg_img_test()
-    plt.show()
+    #jpeg_img_test()
+    #plt.show()
     original_jpeg_convert()
     print("-----------------------------------------------------")
     new_jpeg_convert()
