@@ -1,3 +1,1 @@
-# jpeg_sparse_modeling
- 
-new methond of image compression using L1 norm Regularizatoin.
+# Image Compressing with L1 regularization
