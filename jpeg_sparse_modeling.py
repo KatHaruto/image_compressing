@@ -9,7 +9,8 @@ import time
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
 import re
-
+import sys
+import os
 N = 8
 
 np.set_printoptions(suppress=True)
@@ -40,9 +41,8 @@ class image_JPEG:
     def compress(self,img):
         img_N_division = []
         x,y = img.shape
-        if x %8 != 0 or y %8 != 0:
-            print("Error : image must be square, and its size must be divided 8")
-            return -1
+        if x != y or x %8 != 0 or y %8 != 0:
+            raise Exception("Error : image must be square, and its each size must be divided 8")
         
         for i in range(y//8):
             for j in range(x//8):
@@ -115,9 +115,8 @@ class image_sparse:
     def compress(self,img,lam):
         img_N_division = []
         x,y = img.shape
-        if x %8 != 0 or y %8 != 0:
-            print("Error : Error : image must be square, and its size must be divided 8")
-            return -1
+        if x != y or x %8 != 0 or y %8 != 0:
+            raise Exception("Error : Error : image must be square, and its each size must be divided 8")
         
         for i in range(y//8):
             for j in range(x//8):
@@ -133,6 +132,9 @@ class image_sparse:
                 else:
                     compressed_img_row = np.concatenate([compressed_img_row, compressed_img_N_division], 1)
                     dct_coef_row = np.concatenate([dct_coef_row, dct_coef_N_division], 1)
+
+                print("\r","Progress,",i*(x//8)+j+1," / ",(y//8)*(x//8),"",end='')
+
             if i == 0:
                 compressed_img = compressed_img_row
                 dct_coef = dct_coef_row
@@ -140,7 +142,6 @@ class image_sparse:
                 compressed_img = np.concatenate([compressed_img,  compressed_img_row])
                 dct_coef = np.concatenate([dct_coef,  dct_coef_row])
             
-            print("\r","Progress, ( 1 ~",y//8,")",i+1,end='')
 
         print("")
             
@@ -222,14 +223,19 @@ def correct_abnormal_value(img):
     
 
 def readimg(filename):
-    return cv2.imread(filename, 0).astype(dtype=int)
-if __name__ == "__main__":
-    import os
+    return cv2.imread("./original/"+filename, 0).astype(dtype=int)
+
+def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-    filename = "girl.bmp"
+    if not len(sys.argv) == 2:
+        raise Exception('Error!: two arguments are required')
+
+    filename = sys.argv[1]
     body = re.split(r'\.',filename)[0]
     img = readimg(filename)
+
+    os.makedirs("./images/"+body,exist_ok=True)
     
     plt.figure(figsize=(6, 4))
     plt.subplot(1,2,1)
@@ -239,18 +245,18 @@ if __name__ == "__main__":
 
     image = image_JPEG(N)
     qdct_coef, compressed_img = image.compress(img)
-    print("\nnumber of dct with zero as its coefficient",image.sparse_num)
+    print("Compress image in conventional JPEG")
+    print("\nnumber of dct with zero as its coefficient",image.sparse_num,"/",img.size)
     plt.subplot(1,2,2)
     plt.imshow(compressed_img,vmin=0,vmax=255)
     plt.title("jpeg")
-
     print("\nentropy :",calc_entropy(qdct_coef))
 
     img = readimg(filename)
     print("PSNR :",psnr(img,compressed_img,data_range=255))
     print("SSIM :",ssim(img,compressed_img,data_range=255))
 
-    cv2.imwrite('./'+body+'_jpeg_compress.bmp', compressed_img)
+    cv2.imwrite('./images/'+body+"/"+body+'_jpeg_compress.bmp', compressed_img)
 
 
     print("\n\nCompress images in JPEG format with L1 regularization")
@@ -261,9 +267,9 @@ if __name__ == "__main__":
         sparse = image_sparse(N)
         dct_coef,compressed_img = sparse.compress(img,lam)
         print("lambda=",lam)
-        print("number of L1 with zero as its coefficient",sparse.sparse_num)
+        print("number of L1 with zero as its coefficient",sparse.sparse_num,"/",img.size)
 
-        plt.subplot(1,len(lams),i+1)
+        plt.subplot(2,2,i+1)
         plt.imshow(compressed_img,vmin=0,vmax=255)
         plt.title("lambda={}".format(lam))
 
@@ -274,7 +280,11 @@ if __name__ == "__main__":
         print("PSNR :",psnr(img,compressed_img,data_range=255))
         print("SSIM :",ssim(img,compressed_img,data_range=255))
 
-        cv2.imwrite('./'+body+'_jpeg_compress_with_lasso(lambda='+str(lam)+').bmp', compressed_img)
+        cv2.imwrite('./images/'+body+"/"+body+'_jpeg_compress_with_lasso(lambda='+str(lam)+').bmp', compressed_img)
     plt.suptitle("JPEG format with L1 regularization")
     plt.show()
+    
+
+if __name__ == "__main__":
+    main()
     
