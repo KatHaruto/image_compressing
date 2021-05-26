@@ -20,7 +20,7 @@ $ python jpeg_sparse_modeling.py <filename>
 ```
 
 ## Expected Results
-- New 5 files will be saved.
+- New 1 directory will be made and 5 files will be saved.
   - \<filename\>_jpeg_compressed.bmp  
     compressed image using conventional JPEG 
   - \<filename\>_jpeg_compressed_with_lasso(lambda=\<lambda\>).bmp × 4  
