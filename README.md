@@ -3,7 +3,7 @@ I use L1 regularization in compressing image in JPEG format.
 
 ## implementation
 JPEG has a high image compression ratio by cutting off high frequency components of the image.
-Generally, high frequency components are not important for human recognition of images because they are the boundary areas of an image where colors shift significantly.
+Generally, high frequency components are not important for human recognition of images because they just represent the boundary areas of an image where colors shift significantly.
 
 However, there are cases where JPEG is not a good choice.
 
