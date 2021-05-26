@@ -24,7 +24,7 @@ $ python jpeg_sparse_modeling.py <filename>
   - \<filename\>_jpeg_compressed.bmp  
     compressed image using conventional JPEG 
   - \<filename\>_jpeg_compressed_with_lasso(lambda=\<lambda\>).bmp × 4  
-    compressed image using JPEG + L1 regularization (ex. lambda = \[0.01, 0.1, 1, 5\])
+    compressed image using JPEG + L1 regularization (lambda = \[0.01, 0.1, 1, 5\])
 
 - The following will be output to the console
   <details>
