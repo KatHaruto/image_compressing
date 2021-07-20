@@ -90,4 +90,9 @@ $ python jpeg_sparse_modeling.py <filename>
 
 - 4 images will be plotted
 
+  - \lambda = 0.01 Compression Rate = 21 %
+  - \lambda = 0.1  Compression Rate = 43%
+  - \lambda = 1    Compression Rate = 87%
+  - \lambda = 5    Compression Rate = 96%
+
 ![image](https://user-images.githubusercontent.com/74958594/119597604-5d620a00-be1c-11eb-899c-f0704f38aa1d.png)
